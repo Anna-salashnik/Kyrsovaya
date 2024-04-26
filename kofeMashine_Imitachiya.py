@@ -1,9 +1,12 @@
 class CoffeeMachine:
     def __init__(self):
-        self.water = 1000
-        self.coffee_beans = 500
-        self.milk = 200
-        self.sugar = 100
+        # Инициализация ингредиентов и цен
+        self.ingredients = {
+            "water": 1000,
+            "coffee_beans": 500,
+            "milk": 200,
+            "sugar": 100,
+        }
         self.prices = {
             "espresso": 30,
             "latte": 50,
@@ -16,90 +19,67 @@ class CoffeeMachine:
         print("Латте: 50 мл воды, 20 г кофейных зерен, 100 мл молока")
         print("Американо: 50 мл воды, 20 г кофейных зерен")
         print("Капучино: 50 мл воды, 20 г кофейных зерен, 100 мл молока, 15 г сахара")
-
-    def display_menu(self):
-        print("Добро пожаловать!")
+        
+        # Вывод меню
         print("Меню напитков:")
-        print("1. Эспрессо - 30 рублей")
-        print("2. Латте - 50 рублей")
-        print("3. Американо - 40 рублей")
-        print("4. Капучино - 60 рублей")
+        for coffee, price in self.prices.items():
+            print(f"{coffee}: {price} рублей")
 
     def serve_coffee(self):
-        self.display_menu()
-
-        choice = input("Выберите номер напитка (1 - Эспрессо, 2 - Латте, 3 - Американо, 4 - Капучино): ")
-        if choice not in ["1", "2", "3", "4"]:
-            print("Ошибка: Некорректный выбор.")
+        # Выбор и проверка напитка
+        coffee = input("Выберите напиток (espresso, latte, americano, cappuccino): ")
+        if coffee not in self.prices:
+            print("Неправильный выбор напитка.")
             return
 
-        selected_coffee = "espresso" if choice == "1" else "latte" if choice == "2" else "americano" if choice == "3" else "cappuccino"
-        price = self.prices[selected_coffee]
-
+        # Выбор способа оплаты
         payment_method = input("Выберите способ оплаты (нал/безнал): ")
         if payment_method not in ["нал", "безнал"]:
-            print("Ошибка: Некорректный способ оплаты.")
+            print("Неправильный способ оплаты.")
             return
 
+        # Оплата и выдача сдачи
         money_inserted = float(input("Введите сумму денег: "))
-        if money_inserted < price:
-            print("Ошибка: Недостаточно денег для покупки.")
+        if money_inserted < self.prices[coffee]:
+            print("Недостаточно денег.")
             return
+        change = money_inserted - self.prices[coffee]
 
+        # Добавление сахара
         sugar = input("Добавить сахар? (да/нет): ")
-        
         if sugar not in ["да", "нет"]:
-            print("Ошибка: Некорректный ответ.")
+            print("Неправильный ответ.")
             return
-        
-        self.make_coffee(selected_coffee, money_inserted - price, sugar, payment_method)
+        # Приготовление кофе
+        self.make_coffee(coffee, sugar, payment_method)
 
-    def make_coffee(self, coffee_type, change, sugar, payment_method):
-        if coffee_type == "espresso":
-            if self.water < 50 or self.coffee_beans < 20:
-                print("Ошибка: Недостаточно ингредиентов для приготовления эспрессо.")
-                return
-            self.water -= 50
-            self.coffee_beans -= 20
-            print("Эспрессо готов!")
-        elif coffee_type == "latte":
-            if self.water < 50 or self.coffee_beans < 20 or self.milk < 100:
-                print("Ошибка: Недостаточно ингредиентов для приготовления латте.")
-                return
-            self.water -= 50
-            self.coffee_beans -= 20
-            self.milk -= 100
-            print("Латте готов!")
-        elif coffee_type == "americano":
-            if self.water < 50 or self.coffee_beans < 20:
-                print("Ошибка: Недостаточно ингредиентов для приготовления американо.")
-                return
-            self.water -= 50
-            self.coffee_beans -= 20
-            print("Американо готов!")
-        elif coffee_type == "cappuccino":
-            if self.water < 50 or self.coffee_beans < 20 or self.milk < 100 or self.sugar < 15:
-                print("Ошибка: Недостаточно ингредиентов для приготовления капучино.")
-                return
-            self.water -= 50
-            self.coffee_beans -= 20
-            self.milk -= 100
-            self.sugar -= 15
-            print("Капучино готов!")
-
-        if sugar.lower() == "да":
+        # Выдача кофе и сдачи
+        print(f"{coffee} готов!")
+        if sugar == "да":
             print("Сахар добавлен.")
-
-        if sugar.lower() == "нет":
-            print("Сахар не добавлен.")
-
         if change > 0:
             print(f"Ваша сдача: {change} рублей.")
-
         if payment_method == "безнал":
             print("Спасибо за покупку!")
         elif payment_method == "нал":
             print("Спасибо за наличные!")
+
+    def make_coffee(self, coffee, sugar, payment_method):
+        # Проверка наличия ингредиентов
+        ingredients_needed = {
+            "espresso": {"water": 50, "coffee_beans": 20},
+            "latte": {"water": 50, "coffee_beans": 20, "milk": 100},
+            "americano": {"water": 50, "coffee_beans": 20},
+            "cappuccino": {"water": 50, "coffee_beans": 20, "milk": 100, "sugar": 15},
+        }
+        for ingredient, amount in ingredients_needed[coffee].items():
+            if self.ingredients[ingredient] < amount:
+                print("Недостаточно ингредиентов.")
+                return
+
+        # Приготовление кофе
+        for ingredient, amount in ingredients_needed[coffee].items():
+            self.ingredients[ingredient] -= amount
 
 
 # Использование кофейной машины
